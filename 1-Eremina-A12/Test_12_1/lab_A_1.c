@@ -110,7 +110,6 @@ element* find_element_key(XOR_list* list, char* key) {
 		element* a2 = XOR_procedure(a1->xor_address, 0); //указатель на второй элемент
 
 		if (strcmp(a1->data, key) == 0) {
-
 			return a1;
 		}
 
@@ -366,12 +365,13 @@ void clear_list(XOR_list* list) {
 		element* a2 = XOR_procedure(a1->xor_address, 0);
 
 		if (a2 == list->last) {
-
-		}free(a1);
-		free(a2);
-		list->first = NULL;
-		list->last = NULL;
-		return;
+			list->first = NULL;
+			list->last = NULL;
+			free(a1);
+			free(a2);
+			return;
+		}
+		
 
 		element* next = XOR_procedure(a1, a2->xor_address);
 

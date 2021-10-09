@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "gtest/gtest.h"
-#include "lab_A_1.cpp"
+#include "lab_A_1.c"
 
 TEST(TestCaseName, TestName) {
 	EXPECT_EQ(1, 1);
@@ -69,9 +69,16 @@ XOR_list CreateList_1elem(void) {
 	// Сохраняем строку
 	int len = strlen("one");  // определяем длину строки
 	char* p = (char*)malloc(len + 1); // выделяем память под строку
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
 	// Создаем элемент списка
 	element* new_elem = (element*)malloc(sizeof(element));
-
+	if (new_elem == NULL) {
+		printf("error");
+		exit(1);
+	}
 	strcpy(p, "one"); // копирование строки
 	p[len] = '\0'; // добавим терминальный ноль
 
@@ -80,8 +87,9 @@ XOR_list CreateList_1elem(void) {
 	// Встраиваем элемент в конец списка
 	new_elem->xor_address = XOR_procedure(0, 0);
 	list.first = new_elem;
-
 	list.last = new_elem;
+
+	free(p);
 	return list;
 }
 
@@ -112,11 +120,19 @@ XOR_list CreateList_moreElem(void) {
 	initial(&list);
 
 	//1 элемент
-	// Сохраняем строку в ОП
+	// Сохраняем строку
 	int len = strlen("one");  // определяем длину строки
 	char* p = (char*)malloc(len + 1); // выделяем память под строку
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
 	// Создаем элемент списка
 	element* elem1 = (element*)malloc(sizeof(element));
+	if (elem1 == NULL) {
+		printf("error");
+		exit(1);
+	}
 	strcpy(p, "one"); // копирование строки
 	p[len] = '\0'; // добавим терминальный ноль
 	elem1->data = p; // значение элемента (адрес строки)
@@ -125,10 +141,20 @@ XOR_list CreateList_moreElem(void) {
 	list.first = elem1;
 	list.last = elem1;
 
+	free(p);
+
 	//2 элемент
 	len = strlen("two");
 	p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
 	element* elem2 = (element*)malloc(sizeof(element));
+	if (elem2 == NULL) {
+		printf("error");
+		exit(1);
+	}
 	strcpy(p, "two"); // копирование строки
 	p[len] = '\0'; // добавим терминальный ноль
 	elem2->data = p; // значение элемента (адрес строки)
@@ -139,10 +165,20 @@ XOR_list CreateList_moreElem(void) {
 	list.last->xor_address = XOR_procedure(elem1, elem2);
 	list.last = elem2;
 
+	free(p);
+
 	//3 элемент
 	len = strlen("three");
 	p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
 	element* elem3 = (element*)malloc(sizeof(element));
+	if (elem3 == NULL) {
+		printf("error");
+		exit(1);
+	}
 	strcpy(p, "three"); // копирование строки
 	p[len] = '\0'; // добавим терминальный ноль
 	elem3->data = p; // значение элемента (адрес строки)
@@ -153,10 +189,20 @@ XOR_list CreateList_moreElem(void) {
 	list.last->xor_address = XOR_procedure(elem2, elem3);
 	list.last = elem3;
 
+	free(p);
+
 	//4 элемент
 	len = strlen("four");
 	p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
 	element* elem4 = (element*)malloc(sizeof(element));
+	if (elem4 == NULL) {
+		printf("error");
+		exit(1);
+	}
 	strcpy(p, "four"); // копирование строки
 	p[len] = '\0'; // добавим терминальный ноль
 	elem4->data = p; // значение элемента (адрес строки)
@@ -166,6 +212,8 @@ XOR_list CreateList_moreElem(void) {
 	// обновление xor-адреса последнего элемента списка
 	list.last->xor_address = XOR_procedure(elem3, elem4);
 	list.last = elem4;
+
+	free(p);
 
 	return list;
 
