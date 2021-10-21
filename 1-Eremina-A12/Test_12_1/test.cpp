@@ -16,7 +16,10 @@ TEST(addTest, add_to_emptyList_returnTRUE) {
 	ASSERT_EQ((int)list.first->xor_address, 0);
 	ASSERT_EQ((int)list.last->xor_address, 0);
 
-	clear_list(&list);
+	free(list.first->data);
+	free(list.last->data);
+	free(list.first);
+	free(list.last);
 }
 
 TEST(addTest, add_to_with1ElemList_returnTRUE) {
@@ -33,7 +36,10 @@ TEST(addTest, add_to_with1ElemList_returnTRUE) {
 	ASSERT_EQ(list.first->xor_address, a1->xor_address);
 	ASSERT_EQ(list.last->xor_address, a2->xor_address);
 
-	clear_list(&list);
+	free(a1);
+	free(a2);
+	free(list.first);
+	free(list.last);
 }
 
 TEST(addTest, add_to_moreElemList_returnTRUE) {
@@ -48,7 +54,7 @@ TEST(addTest, add_to_moreElemList_returnTRUE) {
 	ASSERT_TRUE(add_element(&list, "five"));
 	ASSERT_EQ(strcmp(list.last->data, "five"), 0);
 
-	clear_list(&list);
+	free(&list);
 }
 
 TEST(FindElemByKey, find_in_emptyList) {
@@ -59,52 +65,73 @@ TEST(FindElemByKey, find_in_emptyList) {
 	ASSERT_EQ((int)list.first, NULL);
 	ASSERT_EQ((int)list.last, NULL);
 
-	clear_list(&list);
+	free(list.first);
+	free(list.last);
 }
 
-XOR_list CreateList_1elem(void) {
+TEST(FindElemByKey, find_in_1ElemList) {
 	XOR_list list;
 	initial(&list);
 
-	// Сохраняем строку
-	int len = strlen("one");  // определяем длину строки
-	char* p = (char*)malloc(len + 1); // выделяем память под строку
+	int len = strlen("one");  
+	char* p = (char*)malloc(len + 1); 
 	if (p == NULL) {
 		printf("error");
 		exit(1);
 	}
-	// Создаем элемент списка
+	
 	element* new_elem = (element*)malloc(sizeof(element));
 	if (new_elem == NULL) {
 		printf("error");
 		exit(1);
 	}
-	strcpy(p, "one"); // копирование строки
-	p[len] = '\0'; // добавим терминальный ноль
+	strcpy(p, "one"); 
+	p[len] = '\0'; 
 
-	new_elem->data = p; // значение элемента (адрес строки)
+	new_elem->data = p; 
 
-	// Встраиваем элемент в конец списка
 	new_elem->xor_address = XOR_procedure(0, 0);
 	list.first = new_elem;
 	list.last = new_elem;
-
-	free(p);
-	return list;
-}
-
-TEST(FindElemByKey, find_in_1ElemList) {
-	XOR_list list = CreateList_1elem();
 	
 	ASSERT_TRUE(find_element_key(&list, "one"));
 	ASSERT_EQ(find_element_key(&list, "one"), list.first);
 	ASSERT_EQ(find_element_key(&list, "one"), list.last);
 
-	clear_list(&list);
+	free(p);
+	free(new_elem);
+	free(list.first->data);
+	free(list.first->xor_address);
+	free(list.last->data);
+	free(list.last->xor_address);
+	free(list.first);
+	free(list.last);
 }
 
 TEST(FindElemByKey, find_in_1ElemList_noExistElem) {
-	XOR_list list = CreateList_1elem();
+	XOR_list list;
+	initial(&list);
+
+	int len = strlen("one");
+	char* p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
+
+	element* new_elem = (element*)malloc(sizeof(element));
+	if (new_elem == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(p, "one");
+	p[len] = '\0';
+
+	new_elem->data = p;
+
+	new_elem->xor_address = XOR_procedure(0, 0);
+	list.first = new_elem;
+	list.last = new_elem;
 	
 	ASSERT_TRUE(find_element_key(&list, "one"));
 	ASSERT_EQ(find_element_key(&list, "one"), list.first);
@@ -112,41 +139,42 @@ TEST(FindElemByKey, find_in_1ElemList_noExistElem) {
 
 	ASSERT_FALSE(find_element_key(&list, "two"));
 
-	clear_list(&list);
+	free(p);
+	free(new_elem);
+	free(list.first->data);
+	free(list.first->xor_address);
+	free(list.last->data);
+	free(list.last->xor_address);
+	free(list.first);
+	free(list.last);
 }
 
-XOR_list CreateList_moreElem(void) {
+
+TEST(FindElemByKey, find_in_moreElemList) {
 	XOR_list list;
 	initial(&list);
 
-	//1 элемент
-	// Сохраняем строку
-	int len = strlen("one");  // определяем длину строки
-	char* p = (char*)malloc(len + 1); // выделяем память под строку
+	int len = strlen("one");  
+	char* p = (char*)malloc(len + 1); 
 	if (p == NULL) {
 		printf("error");
 		exit(1);
 	}
-	// Создаем элемент списка
 	element* elem1 = (element*)malloc(sizeof(element));
 	if (elem1 == NULL) {
 		printf("error");
 		exit(1);
 	}
-	strcpy(p, "one"); // копирование строки
-	p[len] = '\0'; // добавим терминальный ноль
-	elem1->data = p; // значение элемента (адрес строки)
-	// Встраиваем элемент в конец списка
+	strcpy(p, "one"); 
+	p[len] = '\0'; 
+	elem1->data = p; 
 	elem1->xor_address = XOR_procedure(0, 0);
 	list.first = elem1;
 	list.last = elem1;
 
-	free(p);
-
-	//2 элемент
 	len = strlen("two");
-	p = (char*)malloc(len + 1);
-	if (p == NULL) {
+	char* a = (char*)malloc(len + 1);
+	if (a == NULL) {
 		printf("error");
 		exit(1);
 	}
@@ -155,22 +183,17 @@ XOR_list CreateList_moreElem(void) {
 		printf("error");
 		exit(1);
 	}
-	strcpy(p, "two"); // копирование строки
-	p[len] = '\0'; // добавим терминальный ноль
-	elem2->data = p; // значение элемента (адрес строки)
-	// уже есть больше одного элемента
+	strcpy(a, "two"); 
+	a[len] = '\0'; 
+	elem2->data = a; 
 	elem2->xor_address = XOR_procedure(list.last, 0);
-	elem1 = XOR_procedure(list.last->xor_address, 0); // адрес предпоследнего элемента
-	// обновление xor-адреса последнего элемента списка
+	elem1 = XOR_procedure(list.last->xor_address, 0); 
 	list.last->xor_address = XOR_procedure(elem1, elem2);
 	list.last = elem2;
 
-	free(p);
-
-	//3 элемент
 	len = strlen("three");
-	p = (char*)malloc(len + 1);
-	if (p == NULL) {
+	char* b = (char*)malloc(len + 1);
+	if (b == NULL) {
 		printf("error");
 		exit(1);
 	}
@@ -179,22 +202,17 @@ XOR_list CreateList_moreElem(void) {
 		printf("error");
 		exit(1);
 	}
-	strcpy(p, "three"); // копирование строки
-	p[len] = '\0'; // добавим терминальный ноль
-	elem3->data = p; // значение элемента (адрес строки)
-	// уже есть больше одного элемента
+	strcpy(b, "three"); 
+	b[len] = '\0'; 
+	elem3->data = b; 
 	elem3->xor_address = XOR_procedure(list.last, 0);
-	elem2 = XOR_procedure(list.last->xor_address, 0); // адрес предпоследнего элемента
-	// обновление xor-адреса последнего элемента списка
+	elem2 = XOR_procedure(list.last->xor_address, 0); 
 	list.last->xor_address = XOR_procedure(elem2, elem3);
 	list.last = elem3;
 
-	free(p);
-
-	//4 элемент
 	len = strlen("four");
-	p = (char*)malloc(len + 1);
-	if (p == NULL) {
+	char* c = (char*)malloc(len + 1);
+	if (c == NULL) {
 		printf("error");
 		exit(1);
 	}
@@ -203,23 +221,13 @@ XOR_list CreateList_moreElem(void) {
 		printf("error");
 		exit(1);
 	}
-	strcpy(p, "four"); // копирование строки
-	p[len] = '\0'; // добавим терминальный ноль
-	elem4->data = p; // значение элемента (адрес строки)
-	// уже есть больше одного элемента
+	strcpy(c, "four"); 
+	c[len] = '\0'; 
+	elem4->data = c; 
 	elem4->xor_address = XOR_procedure(list.last, 0);
-	elem3 = XOR_procedure(list.last->xor_address, 0); // адрес предпоследнего элемента
-	// обновление xor-адреса последнего элемента списка
+	elem3 = XOR_procedure(list.last->xor_address, 0); 
 	list.last->xor_address = XOR_procedure(elem3, elem4);
 	list.last = elem4;
-
-	free(p);
-
-	return list;
-
-}
-TEST(FindElemByKey, find_in_moreElemList) {
-	XOR_list list = CreateList_moreElem();
 
 	ASSERT_TRUE(find_element_key(&list, "one"));
 	ASSERT_TRUE(find_element_key(&list, "two"));
@@ -228,12 +236,110 @@ TEST(FindElemByKey, find_in_moreElemList) {
 	ASSERT_EQ(find_element_key(&list, "one"), list.first);
 	ASSERT_EQ(find_element_key(&list, "four"), list.last);
 
+	free(p);
+	free(a);
+	free(b);
+	free(c);
+	free(&len);
+	free(elem1->data);
+	free(elem1->xor_address);
+	free(elem2->data);
+	free(elem2->xor_address);
+	free(elem3->data);
+	free(elem3->xor_address);
+	free(elem4->data);
+	free(elem4->xor_address);
+	free(elem1);
+	free(elem2);
+	free(elem3);
+	free(elem4);
+	free(list.last->data);
+	free(list.last->data);
+	free(list.first->xor_address);
+	free(list.last->xor_address);
+	free(list.last);
+	free(list.first);
 
-	clear_list(&list);
 }
 
 TEST(FindElemByKey, find_in_moreElemList_noExistElem) {
-	XOR_list list = CreateList_moreElem();
+	XOR_list list;
+	initial(&list);
+
+	int len = strlen("one");
+	char* p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem1 = (element*)malloc(sizeof(element));
+	if (elem1 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(p, "one");
+	p[len] = '\0';
+	elem1->data = p;
+	elem1->xor_address = XOR_procedure(0, 0);
+	list.first = elem1;
+	list.last = elem1;
+
+	len = strlen("two");
+	char* a = (char*)malloc(len + 1);
+	if (a == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem2 = (element*)malloc(sizeof(element));
+	if (elem2 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(a, "two");
+	a[len] = '\0';
+	elem2->data = a;
+	elem2->xor_address = XOR_procedure(list.last, 0);
+	elem1 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem1, elem2);
+	list.last = elem2;
+
+	len = strlen("three");
+	char* b = (char*)malloc(len + 1);
+	if (b == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem3 = (element*)malloc(sizeof(element));
+	if (elem3 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(b, "three");
+	b[len] = '\0';
+	elem3->data = b;
+	elem3->xor_address = XOR_procedure(list.last, 0);
+	elem2 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem2, elem3);
+	list.last = elem3;
+
+	len = strlen("four");
+	char* c = (char*)malloc(len + 1);
+	if (c == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem4 = (element*)malloc(sizeof(element));
+	if (elem4 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(c, "four");
+	c[len] = '\0';
+	elem4->data = c;
+	elem4->xor_address = XOR_procedure(list.last, 0);
+	elem3 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem3, elem4);
+	list.last = elem4;
 
 	ASSERT_TRUE(find_element_key(&list, "one"));
 	ASSERT_TRUE(find_element_key(&list, "two"));
@@ -245,7 +351,29 @@ TEST(FindElemByKey, find_in_moreElemList_noExistElem) {
 	ASSERT_FALSE(find_element_key(&list, "six"));
 	ASSERT_FALSE(find_element_key(&list, "seven"));
 
-	clear_list(&list);
+	free(p);
+	free(a);
+	free(b);
+	free(c);
+	free(&len);
+	free(elem1->data);
+	free(elem1->xor_address);
+	free(elem2->data);
+	free(elem2->xor_address);
+	free(elem3->data);
+	free(elem3->xor_address);
+	free(elem4->data);
+	free(elem4->xor_address);
+	free(elem1);
+	free(elem2);
+	free(elem3);
+	free(elem4);
+	free(list.last->data);
+	free(list.last->data);
+	free(list.first->xor_address);
+	free(list.last->xor_address);
+	free(list.last);
+	free(list.first);
 }
 
 TEST(DeleteElemByKey, delete_in_emptyList) {
@@ -256,14 +384,39 @@ TEST(DeleteElemByKey, delete_in_emptyList) {
 	ASSERT_EQ((int)list.first, NULL);
 	ASSERT_EQ((int)list.last, NULL);
 
-	clear_list(&list);
+	free(list.first->data);
+	free(list.first->xor_address);
+	free(list.last->data);
+	free(list.last->xor_address);
+	free(list.last);
+	free(list.first);
 }
 
 TEST(DeleteElemByKey, delete_in_1ElemList) {
 	XOR_list list;
 	initial(&list);
 
-	add_element(&list, "one");
+	int len = strlen("one");
+	char* p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
+
+	element* new_elem = (element*)malloc(sizeof(element));
+	if (new_elem == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(p, "one");
+	p[len] = '\0';
+
+	new_elem->data = p;
+
+	new_elem->xor_address = XOR_procedure(0, 0);
+	list.first = new_elem;
+	list.last = new_elem;
+
 	ASSERT_TRUE(find_element_key(&list, "one"));
 	ASSERT_EQ((int)list.first->xor_address, 0);
 	ASSERT_EQ((int)list.last->xor_address, 0);
@@ -272,30 +425,134 @@ TEST(DeleteElemByKey, delete_in_1ElemList) {
 	ASSERT_EQ((int)list.first, NULL);
 	ASSERT_EQ((int)list.last, NULL);
 
-	clear_list(&list);
+	free(p);
+	free(new_elem);
+	free(list.first->data);
+	free(list.first->xor_address);
+	free(list.last->data);
+	free(list.last->xor_address);
+	free(list.first);
+	free(list.last);
 }
 
 TEST(DeleteElemByKey, delete_in_1ElemList_noExist) {
 	XOR_list list;
 	initial(&list);
 
-	add_element(&list, "one");
+	int len = strlen("one");
+	char* p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
+
+	element* new_elem = (element*)malloc(sizeof(element));
+	if (new_elem == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(p, "one");
+	p[len] = '\0';
+
+	new_elem->data = p;
+
+	new_elem->xor_address = XOR_procedure(0, 0);
+	list.first = new_elem;
+	list.last = new_elem;
+
 	ASSERT_EQ((int)list.first->xor_address, 0);
 	ASSERT_EQ((int)list.last->xor_address, 0);
 
 	ASSERT_FALSE(delete_element_key(&list, "three"));
 
-	clear_list(&list);
+	free(p);
+	free(new_elem);
+	free(list.first->data);
+	free(list.first->xor_address);
+	free(list.last->data);
+	free(list.last->xor_address);
+	free(list.first);
+	free(list.last);
 }
 
 TEST(DeleteElemByKey, delete_in_moreElemList) {
 	XOR_list list;
 	initial(&list);
 
-	add_element(&list, "one");
-	add_element(&list, "two");
-	add_element(&list, "three");
-	add_element(&list, "for");
+	int len = strlen("one");
+	char* p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem1 = (element*)malloc(sizeof(element));
+	if (elem1 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(p, "one");
+	p[len] = '\0';
+	elem1->data = p;
+	elem1->xor_address = XOR_procedure(0, 0);
+	list.first = elem1;
+	list.last = elem1;
+
+	len = strlen("two");
+	char* a = (char*)malloc(len + 1);
+	if (a == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem2 = (element*)malloc(sizeof(element));
+	if (elem2 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(a, "two");
+	a[len] = '\0';
+	elem2->data = a;
+	elem2->xor_address = XOR_procedure(list.last, 0);
+	elem1 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem1, elem2);
+	list.last = elem2;
+
+	len = strlen("three");
+	char* b = (char*)malloc(len + 1);
+	if (b == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem3 = (element*)malloc(sizeof(element));
+	if (elem3 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(b, "three");
+	b[len] = '\0';
+	elem3->data = b;
+	elem3->xor_address = XOR_procedure(list.last, 0);
+	elem2 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem2, elem3);
+	list.last = elem3;
+
+	len = strlen("four");
+	char* c = (char*)malloc(len + 1);
+	if (c == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem4 = (element*)malloc(sizeof(element));
+	if (elem4 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(c, "four");
+	c[len] = '\0';
+	elem4->data = c;
+	elem4->xor_address = XOR_procedure(list.last, 0);
+	elem3 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem3, elem4);
+	list.last = elem4;
 
 	ASSERT_TRUE(find_element_key(&list, "one"));
 	ASSERT_TRUE(delete_element_key(&list, "one"));
@@ -309,17 +566,109 @@ TEST(DeleteElemByKey, delete_in_moreElemList) {
 	ASSERT_TRUE(delete_element_key(&list, "two"));
 	ASSERT_EQ((int)find_element_key(&list, "two"), NULL);
 
-	clear_list(&list);
+	free(p);
+	free(a);
+	free(b);
+	free(c);
+	free(&len);
+	free(elem1->data);
+	free(elem1->xor_address);
+	free(elem2->data);
+	free(elem2->xor_address);
+	free(elem3->data);
+	free(elem3->xor_address);
+	free(elem4->data);
+	free(elem4->xor_address);
+	free(elem1);
+	free(elem2);
+	free(elem3);
+	free(elem4);
+	free(list.last->data);
+	free(list.last->data);
+	free(list.first->xor_address);
+	free(list.last->xor_address);
+	free(list.last);
+	free(list.first);
 }
 
 TEST(DeleteElemByKey, delete_in_moreElemList_noExist) {
 	XOR_list list;
 	initial(&list);
 
-	add_element(&list, "one");
-	add_element(&list, "two");
-	add_element(&list, "three");
-	add_element(&list, "for");
+	int len = strlen("one");
+	char* p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem1 = (element*)malloc(sizeof(element));
+	if (elem1 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(p, "one");
+	p[len] = '\0';
+	elem1->data = p;
+	elem1->xor_address = XOR_procedure(0, 0);
+	list.first = elem1;
+	list.last = elem1;
+
+	len = strlen("two");
+	char* a = (char*)malloc(len + 1);
+	if (a == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem2 = (element*)malloc(sizeof(element));
+	if (elem2 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(a, "two");
+	a[len] = '\0';
+	elem2->data = a;
+	elem2->xor_address = XOR_procedure(list.last, 0);
+	elem1 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem1, elem2);
+	list.last = elem2;
+
+	len = strlen("three");
+	char* b = (char*)malloc(len + 1);
+	if (b == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem3 = (element*)malloc(sizeof(element));
+	if (elem3 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(b, "three");
+	b[len] = '\0';
+	elem3->data = b;
+	elem3->xor_address = XOR_procedure(list.last, 0);
+	elem2 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem2, elem3);
+	list.last = elem3;
+
+	len = strlen("four");
+	char* c = (char*)malloc(len + 1);
+	if (c == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem4 = (element*)malloc(sizeof(element));
+	if (elem4 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(c, "four");
+	c[len] = '\0';
+	elem4->data = c;
+	elem4->xor_address = XOR_procedure(list.last, 0);
+	elem3 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem3, elem4);
+	list.last = elem4;
 
 	ASSERT_TRUE(find_element_key(&list, "three"));
 	ASSERT_TRUE(delete_element_key(&list, "three"));
@@ -329,7 +678,29 @@ TEST(DeleteElemByKey, delete_in_moreElemList_noExist) {
 	ASSERT_FALSE(delete_element_key(&list, "hello"));
 	ASSERT_EQ((int)find_element_key(&list, "hello"), NULL);
 
-	clear_list(&list);
+	free(p);
+	free(a);
+	free(b);
+	free(c);
+	free(&len);
+	free(elem1->data);
+	free(elem1->xor_address);
+	free(elem2->data);
+	free(elem2->xor_address);
+	free(elem3->data);
+	free(elem3->xor_address);
+	free(elem4->data);
+	free(elem4->xor_address);
+	free(elem1);
+	free(elem2);
+	free(elem3);
+	free(elem4);
+	free(list.last->data);
+	free(list.last->data);
+	free(list.first->xor_address);
+	free(list.last->xor_address);
+	free(list.last);
+	free(list.first);
 }
 
 TEST(DeleteElemByAddress, delete_in_emptyList) {
@@ -340,14 +711,39 @@ TEST(DeleteElemByAddress, delete_in_emptyList) {
 	ASSERT_EQ((int)list.first, NULL);
 	ASSERT_EQ((int)list.last, NULL);
 
-	clear_list(&list);
+	free(list.first->data);
+	free(list.last->data);
+	free(list.first->xor_address);
+	free(list.last->xor_address);
+	free(list.first);
+	free(list.last);
 }
 
 TEST(DeleteElemByAddress, delete_in_1ElemList) {
 	XOR_list list;
 	initial(&list);
 
-	add_element(&list, "one");
+	int len = strlen("one");
+	char* p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
+
+	element* new_elem = (element*)malloc(sizeof(element));
+	if (new_elem == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(p, "one");
+	p[len] = '\0';
+
+	new_elem->data = p;
+
+	new_elem->xor_address = XOR_procedure(0, 0);
+	list.first = new_elem;
+	list.last = new_elem;
+
 	element* a = find_element_key(&list, "one");
 	ASSERT_TRUE(delete_element_key(&list, a->data));
 	ASSERT_EQ((int)list.first, NULL);
@@ -355,32 +751,140 @@ TEST(DeleteElemByAddress, delete_in_1ElemList) {
 
 	ASSERT_FALSE(find_element_key(&list, "one"));
 
-	clear_list(&list);
+	free(p);
+	free(new_elem);
+	free(list.first->data);
+	free(list.last->data);
+	free(list.first->xor_address);
+	free(list.last->xor_address);
+	free(list.first);
+	free(list.last);
+	free(a->data);
+	free(a->xor_address);
+	free(a);
 }
 
 TEST(DeleteElemByAddress, delete_in_1ElemList_noExist) {
 	XOR_list list;
 	initial(&list);
 
-	add_element(&list, "one");
+	int len = strlen("one");
+	char* p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
+
+	element* new_elem = (element*)malloc(sizeof(element));
+	if (new_elem == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(p, "one");
+	p[len] = '\0';
+
+	new_elem->data = p;
+
+	new_elem->xor_address = XOR_procedure(0, 0);
+	list.first = new_elem;
+	list.last = new_elem;
+
 	ASSERT_TRUE(find_element_key(&list, "one"));
-	element* p = find_element_key(&list, "two");
+	element* a = find_element_key(&list, "two");
 	ASSERT_EQ((int)list.first->xor_address, 0);
 	ASSERT_EQ((int)list.last->xor_address, 0);
 
-	ASSERT_FALSE(delete_element_key(&list, p->data));
+	ASSERT_FALSE(delete_element_key(&list, a->data));
 
-	clear_list(&list);
+	free(list.first->data);
+	free(list.last->data);
+	free(list.first->xor_address);
+	free(list.last->xor_address);
+	free(list.first);
+	free(list.last);
+	free(a->data);
+	free(a->xor_address);
+	free(a);
 }
 
 TEST(DeleteElemByAddress, delete_in_moreElemList) {
 	XOR_list list;
 	initial(&list);
 
-	add_element(&list, "one");
-	add_element(&list, "two");
-	add_element(&list, "three");
-	add_element(&list, "for");
+	int len = strlen("one");
+	char* p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem1 = (element*)malloc(sizeof(element));
+	if (elem1 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(p, "one");
+	p[len] = '\0';
+	elem1->data = p;
+	elem1->xor_address = XOR_procedure(0, 0);
+	list.first = elem1;
+	list.last = elem1;
+
+	len = strlen("two");
+	char* a = (char*)malloc(len + 1);
+	if (a == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem2 = (element*)malloc(sizeof(element));
+	if (elem2 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(a, "two");
+	a[len] = '\0';
+	elem2->data = a;
+	elem2->xor_address = XOR_procedure(list.last, 0);
+	elem1 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem1, elem2);
+	list.last = elem2;
+
+	len = strlen("three");
+	char* b = (char*)malloc(len + 1);
+	if (b == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem3 = (element*)malloc(sizeof(element));
+	if (elem3 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(b, "three");
+	b[len] = '\0';
+	elem3->data = b;
+	elem3->xor_address = XOR_procedure(list.last, 0);
+	elem2 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem2, elem3);
+	list.last = elem3;
+
+	len = strlen("four");
+	char* c = (char*)malloc(len + 1);
+	if (c == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem4 = (element*)malloc(sizeof(element));
+	if (elem4 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(c, "four");
+	c[len] = '\0';
+	elem4->data = c;
+	elem4->xor_address = XOR_procedure(list.last, 0);
+	elem3 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem3, elem4);
+	list.last = elem4;
 
 	ASSERT_TRUE(find_element_key(&list, "one"));
 	element* p1 = find_element_key(&list, "one");
@@ -397,17 +901,112 @@ TEST(DeleteElemByAddress, delete_in_moreElemList) {
 	ASSERT_TRUE(delete_element_key(&list, p1->data));
 	ASSERT_FALSE(find_element_key(&list, "two"));
 
-	clear_list(&list);
+	free(p1->data);
+	free(p1->xor_address);
+	free(p1);
+	free(p);
+	free(a);
+	free(b);
+	free(c);
+	free(&len);
+	free(elem1->data);
+	free(elem1->xor_address);
+	free(elem2->data);
+	free(elem2->xor_address);
+	free(elem3->data);
+	free(elem3->xor_address);
+	free(elem4->data);
+	free(elem4->xor_address);
+	free(elem1);
+	free(elem2);
+	free(elem3);
+	free(elem4);
+	free(list.last->data);
+	free(list.last->data);
+	free(list.first->xor_address);
+	free(list.last->xor_address);
+	free(list.last);
+	free(list.first);
 }
 
 TEST(DeleteElemByAddress, delete_in_moreElemList_noExist) {
 	XOR_list list;
 	initial(&list);
 
-	add_element(&list, "one");
-	add_element(&list, "two");
-	add_element(&list, "three");
-	add_element(&list, "for");
+	int len = strlen("one");
+	char* p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem1 = (element*)malloc(sizeof(element));
+	if (elem1 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(p, "one");
+	p[len] = '\0';
+	elem1->data = p;
+	elem1->xor_address = XOR_procedure(0, 0);
+	list.first = elem1;
+	list.last = elem1;
+
+	len = strlen("two");
+	char* a = (char*)malloc(len + 1);
+	if (a == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem2 = (element*)malloc(sizeof(element));
+	if (elem2 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(a, "two");
+	a[len] = '\0';
+	elem2->data = a;
+	elem2->xor_address = XOR_procedure(list.last, 0);
+	elem1 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem1, elem2);
+	list.last = elem2;
+
+	len = strlen("three");
+	char* b = (char*)malloc(len + 1);
+	if (b == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem3 = (element*)malloc(sizeof(element));
+	if (elem3 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(b, "three");
+	b[len] = '\0';
+	elem3->data = b;
+	elem3->xor_address = XOR_procedure(list.last, 0);
+	elem2 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem2, elem3);
+	list.last = elem3;
+
+	len = strlen("four");
+	char* c = (char*)malloc(len + 1);
+	if (c == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem4 = (element*)malloc(sizeof(element));
+	if (elem4 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(c, "four");
+	c[len] = '\0';
+	elem4->data = c;
+	elem4->xor_address = XOR_procedure(list.last, 0);
+	elem3 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem3, elem4);
+	list.last = elem4;
 
 	ASSERT_TRUE(find_element_key(&list, "three"));
 	ASSERT_TRUE(delete_element_key(&list, "three"));
@@ -417,7 +1016,32 @@ TEST(DeleteElemByAddress, delete_in_moreElemList_noExist) {
 	element* p1 = find_element_key(&list, "hello");
 	ASSERT_FALSE(delete_element_key(&list, p1->data));
 
-	clear_list(&list);
+	free(p1->data);
+	free(p1->xor_address);
+	free(p1);
+	free(p);
+	free(a);
+	free(b);
+	free(c);
+	free(&len);
+	free(elem1->data);
+	free(elem1->xor_address);
+	free(elem2->data);
+	free(elem2->xor_address);
+	free(elem3->data);
+	free(elem3->xor_address);
+	free(elem4->data);
+	free(elem4->xor_address);
+	free(elem1);
+	free(elem2);
+	free(elem3);
+	free(elem4);
+	free(list.last->data);
+	free(list.last->data);
+	free(list.first->xor_address);
+	free(list.last->xor_address);
+	free(list.last);
+	free(list.first);
 }
 
 TEST(Next, Next_in_emptyList) {
@@ -426,41 +1050,215 @@ TEST(Next, Next_in_emptyList) {
 
 	ASSERT_FALSE(next(&list, (element*)1));
 
-	clear_list(&list);
+	free(list.first->data);
+	free(list.first->xor_address);
+	free(list.last->data);
+	free(list.last->xor_address);
+	free(list.first);
+	free(list.last);
 }
 
 TEST(Next, Next_in_1ElemList) {
 	XOR_list list;
 	initial(&list);
 
-	add_element(&list, "one");
+	int len = strlen("one");
+	char* p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
+
+	element* new_elem = (element*)malloc(sizeof(element));
+	if (new_elem == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(p, "one");
+	p[len] = '\0';
+
+	new_elem->data = p;
+
+	new_elem->xor_address = XOR_procedure(0, 0);
+	list.first = new_elem;
+	list.last = new_elem;
+
 	ASSERT_FALSE(next(&list, find_element_key(&list, "one")));
 
-	clear_list(&list);
+	free(p);
+	free(new_elem);
+	free(&len);
+	free(list.first->data);
+	free(list.last->data);
+	free(list.first->xor_address);
+	free(list.last->xor_address);
+	free(list.first);
+	free(list.last);
 }
 
 TEST(Next, Next_lastElem_in_moreElemeList) {
 	XOR_list list;
 	initial(&list);
 
-	add_element(&list, "one");
-	add_element(&list, "two");
-	add_element(&list, "three");
+	int len = strlen("one");
+	char* p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem1 = (element*)malloc(sizeof(element));
+	if (elem1 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(p, "one");
+	p[len] = '\0';
+	elem1->data = p;
+	elem1->xor_address = XOR_procedure(0, 0);
+	list.first = elem1;
+	list.last = elem1;
+
+	len = strlen("two");
+	char* a = (char*)malloc(len + 1);
+	if (a == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem2 = (element*)malloc(sizeof(element));
+	if (elem2 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(a, "two");
+	a[len] = '\0';
+	elem2->data = a;
+	elem2->xor_address = XOR_procedure(list.last, 0);
+	elem1 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem1, elem2);
+	list.last = elem2;
+
+	len = strlen("three");
+	char* b = (char*)malloc(len + 1);
+	if (b == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem3 = (element*)malloc(sizeof(element));
+	if (elem3 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(b, "three");
+	b[len] = '\0';
+	elem3->data = b;
+	elem3->xor_address = XOR_procedure(list.last, 0);
+	elem2 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem2, elem3);
+	list.last = elem3;
+
 	ASSERT_FALSE(next(&list, find_element_key(&list, "three")));
 
-	clear_list(&list);
+	free(p);
+	free(a);
+	free(b);
+	free(&len);
+	free(elem1->data);
+	free(elem1->xor_address);
+	free(elem2->data);
+	free(elem2->xor_address);
+	free(elem3->data);
+	free(elem3->xor_address);
+	free(elem1);
+	free(elem2);
+	free(elem3);
+	free(list.last->data);
+	free(list.last->data);
+	free(list.first->xor_address);
+	free(list.last->xor_address);
+	free(list.last);
+	free(list.first);
 }
 
 TEST(Next, Next_in_moreElemeList) {
 	XOR_list list;
 	initial(&list);
 
-	add_element(&list, "one");
-	add_element(&list, "two");
-	add_element(&list, "three");
+	int len = strlen("one");
+	char* p = (char*)malloc(len + 1);
+	if (p == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem1 = (element*)malloc(sizeof(element));
+	if (elem1 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(p, "one");
+	p[len] = '\0';
+	elem1->data = p;
+	elem1->xor_address = XOR_procedure(0, 0);
+	list.first = elem1;
+	list.last = elem1;
+
+	len = strlen("two");
+	char* a = (char*)malloc(len + 1);
+	if (a == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem2 = (element*)malloc(sizeof(element));
+	if (elem2 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(a, "two");
+	a[len] = '\0';
+	elem2->data = a;
+	elem2->xor_address = XOR_procedure(list.last, 0);
+	elem1 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem1, elem2);
+	list.last = elem2;
+
+	len = strlen("three");
+	char* b = (char*)malloc(len + 1);
+	if (b == NULL) {
+		printf("error");
+		exit(1);
+	}
+	element* elem3 = (element*)malloc(sizeof(element));
+	if (elem3 == NULL) {
+		printf("error");
+		exit(1);
+	}
+	strcpy(b, "three");
+	b[len] = '\0';
+	elem3->data = b;
+	elem3->xor_address = XOR_procedure(list.last, 0);
+	elem2 = XOR_procedure(list.last->xor_address, 0);
+	list.last->xor_address = XOR_procedure(elem2, elem3);
+	list.last = elem3;
 
 	ASSERT_TRUE(next(&list, find_element_key(&list, "one")));
 	ASSERT_TRUE(next(&list, find_element_key(&list, "two")));
 
-	clear_list(&list);
+	free(p);
+	free(a);
+	free(b);
+	free(&len);
+	free(elem1->data);
+	free(elem1->xor_address);
+	free(elem2->data);
+	free(elem2->xor_address);
+	free(elem3->data);
+	free(elem3->xor_address);
+	free(elem1);
+	free(elem2);
+	free(elem3);
+	free(list.last->data);
+	free(list.last->data);
+	free(list.first->xor_address);
+	free(list.last->xor_address);
+	free(list.last);
+	free(list.first);
 }
