@@ -1,10 +1,13 @@
-﻿#include <stdlib.h>
+﻿#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 
 #define LABD_DOPF_H
 #define PLUS_RANGE(val) (((val) >= 0) ? (val): 0)
+
+#pragma warning(disable:4996)
 
 typedef struct {
     int l_t;
@@ -13,37 +16,9 @@ typedef struct {
     int used_flag;
 } Good;
 
-void stress_test() {
-    FILE* input = fopen("C:\\Users\\79215\\Desktop\\ПолитИк\\2 курс\\3 сем\\Алгосы\\1-EreminaKsenia-D29\\input.txt", "r");
-    unsigned int n, k;
-    fscanf(input, "%d %d\n", &n, &k);
-    Good* goods = (Good*)malloc(sizeof(Good) * n);
-    memset(goods, 0, sizeof(Good) * n);
-    unsigned int* ans = (unsigned int*)malloc(sizeof(unsigned int) * n);
-    memset(ans, 0, sizeof(unsigned int) * n);
-    for (int i = 0; i < n; i++) {
-        fscanf(input, "%d %d %d", &goods[i].l_t, &goods[i].d_t, &goods[i].w_t);
-    }
-    unsigned long start = clock();
-    int cheak_solver = delivery_solver(goods, n, k, ans);
-    double time = (double)(clock() - start) / CLOCKS_PER_SEC;
-    printf("%f\n", time);
-    FILE* output = fopen("C:\\Users\\79215\\Desktop\\ПолитИк\\2 курс\\3 сем\\Алгосы\\1-EreminaKsenia-D29\\output.txt", "w");
-    if (cheak_solver) {
-        for (int i = 0; i < n; i++) {
-            fprintf(output, "%d ", ans[i]);
-        }
-    }
-    else {
-        fprintf(output, "%d ", 0);
-    }
-    fclose(output);
-    fclose(input);
-}
-
-int solver(Good* goods, unsigned N, unsigned K,
-    int* sigma, unsigned int* ans, unsigned sum,
-    int first_iter_flag, unsigned iterator, Good* prev) {
+int solver(Good* goods, int N, int K,
+    int* sigma, int* ans, int sum,
+    int first_iter_flag, int iterator, Good* prev) {
 
     if (iterator == N || sum > K) {
         if (sum <= K) {
@@ -79,10 +54,45 @@ int solver(Good* goods, unsigned N, unsigned K,
     return 0;
 }
 
-int delivery_solver(Good* goods, unsigned N, unsigned K, unsigned int* ans) {
+int delivery_solver(Good* goods, int N, int K, int* ans) {
     int* sigma = (int*)malloc(sizeof(int) * N);
-    memset(sigma, 0, sizeof(int) * N);
+    if (sigma != NULL)
+        memset(sigma, '0', sizeof(int) * N); 
     int answer = solver(goods, N, K, sigma, ans, 0, 1, 0, NULL);
     free(sigma);
     return answer;
+}
+
+int main(void)
+{
+    FILE* input = fopen("input.txt", "r");
+    int n, k;
+    fscanf(input, "%d %d\n", &n, &k);
+
+    Good* goods = (Good*)malloc(sizeof(Good) * n);
+    if (goods != NULL)
+        memset(goods, 0, sizeof(Good) * n);
+    
+    int* ans = (int*)malloc(sizeof(int) * n);
+    if(ans != NULL)
+        memset(ans, '0', sizeof(int) * n);
+
+    for (int i = 0; i < n; i++) {
+        fscanf(input, "%d %d %d", &goods[i].l_t, &goods[i].d_t, &goods[i].w_t);
+    }
+
+    int cheak_solver = delivery_solver(goods, n, k, ans);
+
+    FILE* output = fopen("output.txt", "w");
+    if (cheak_solver) {
+        for (int i = 0; i < n; i++) {
+            fprintf(output,"%d ", ans[i]);
+        }
+    }
+    else {
+        fprintf(output, "%d ", 0);
+    }
+    fclose(output);
+    fclose(input);
+    return 0;
 }
