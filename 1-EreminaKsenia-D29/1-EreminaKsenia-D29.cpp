@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define LABD_DOPF_H
 #define PLUS_RANGE(val) (((val) >= 0) ? (val): 0)
 
 #pragma warning(disable:4996)
@@ -28,7 +27,7 @@ int solver(Good* goods, int N, int K,
             return 0;
         }
     }
-    for (unsigned i = 0; i < N; i++) {
+    for (int i = 0; i < N; i++) {
         if (!goods[i].used_flag) {
 
             goods[i].used_flag = 1;
@@ -41,7 +40,7 @@ int solver(Good* goods, int N, int K,
                 sigma[iterator] = sigma[iterator - 1] + prev->l_t;
             }
 
-            unsigned sum_val = PLUS_RANGE((sigma[iterator] + goods[i].l_t - goods[i].d_t)) * goods[i].w_t;
+            int sum_val = PLUS_RANGE((sigma[iterator] + goods[i].l_t - goods[i].d_t)) * goods[i].w_t;
             sum += sum_val;
 
             if (solver(goods, N, K, sigma, ans, sum, 0, iterator + 1, &goods[i])) {
@@ -67,23 +66,53 @@ int main(void)
 {
     FILE* input = fopen("input.txt", "r");
     int n, k;
-    fscanf(input, "%d %d\n", &n, &k);
 
+    if (input == NULL)
+    {
+        printf("no file\n");
+        fclose(input);
+        return 1;
+    }
+
+    if (fscanf(input, "%d %d\n", &n, &k) != 2)
+    {
+        printf("no elements\n");
+        fclose(input);
+        return 1;
+    }
+            
     Good* goods = (Good*)malloc(sizeof(Good) * n);
-    if (goods != NULL)
+    if (goods == NULL)
+    {
+        printf("error\n");
+        free(goods);
+        fclose(input);
+        return 1;
+    }
+    else
         memset(goods, 0, sizeof(Good) * n);
     
     int* ans = (int*)malloc(sizeof(int) * n);
-    if(ans != NULL)
+    if (ans == NULL)
+    {
+        printf("error\n");
+        free(ans);
+        free(goods);
+        fclose(input);
+        return 1;
+    }
+    else
         memset(ans, '0', sizeof(int) * n);
 
     for (int i = 0; i < n; i++) {
-        fscanf(input, "%d %d %d", &goods[i].l_t, &goods[i].d_t, &goods[i].w_t);
+        if (fscanf(input, "%d %d %d", &goods[i].l_t, &goods[i].d_t, &goods[i].w_t) == 3)
+            continue;
     }
 
     int cheak_solver = delivery_solver(goods, n, k, ans);
 
     FILE* output = fopen("output.txt", "w");
+
     if (cheak_solver) {
         for (int i = 0; i < n; i++) {
             fprintf(output,"%d ", ans[i]);
@@ -94,5 +123,7 @@ int main(void)
     }
     fclose(output);
     fclose(input);
+    free(ans);
+    free(goods);
     return 0;
 }
